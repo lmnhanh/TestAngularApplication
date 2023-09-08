@@ -1,0 +1,27 @@
+<p>group-list works!</p>
+<button nz-button nzType="primary" nzSize="default" nzShape="round" (click)="fetchGroup()">
+    <span nz-icon nzType="download"></span>
+    Load All Groups
+</button>
+<nz-table #basicTable [nzData]="listGroups.pageItemList">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Address</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of listGroups.pageItemList">
+        <td>{{ data.name }}</td>
+        <td>{{ data.approvedConfigurationId }}</td>
+        <td>{{ data.deviceCount }}</td>
+        <td>
+          <a>Action 一 {{ data.name }}</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a>Delete</a>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
