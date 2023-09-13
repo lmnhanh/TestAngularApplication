@@ -5,7 +5,7 @@ import { BaseApiRequest } from "./base.request";
 @Injectable({
     providedIn: "root",
 })
-export class GroupApiRequest extends BaseApiRequest{
+export class AuthApiRequest extends BaseApiRequest{
     constructor(httpClient: HttpClient){
         super(httpClient, 'https://localhost:44329');
     }

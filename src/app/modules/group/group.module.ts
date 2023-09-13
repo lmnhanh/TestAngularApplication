@@ -1,14 +1,11 @@
 import { NgModule } from '@angular/core';
-import { GroupComponent } from './group.component';
 import { GroupListComponent } from './components/group-list/group-list.component';
 import { GroupCreateFormComponent } from './components/group-create-form/group-create-form.component';
-import { SharedModule } from 'app/shared/Shared.module';
 import { GroupRoutingModule } from './group-routing.module';
-
+import { SharedModule } from 'app/modules/shared/shared.module';
 
 @NgModule({
   declarations: [
-    GroupComponent,
     GroupListComponent,
     GroupCreateFormComponent,
   ],
@@ -17,9 +14,8 @@ import { GroupRoutingModule } from './group-routing.module';
     GroupRoutingModule
   ],
   exports:[
-    GroupComponent,
     GroupListComponent,
-    GroupCreateFormComponent,
+    GroupCreateFormComponent
   ]
 })
 export class GroupModule { }
