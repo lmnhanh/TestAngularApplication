@@ -1,65 +1,91 @@
 import { Component } from '@angular/core';
 import { GroupSearchReq } from '../../models/GroupSearchReq';
-import { IPagedModel } from 'app/core/interfaces/IPagedModel';
-import { IGroupView } from '../../interfaces/IGroupView';
+import { PagedModel } from 'app/core/interfaces/PagedModel';
+import { GroupView } from '../../../shared/interfaces/GroupView';
 import { GroupService } from '../../services/group.service';
-import { BehaviorSubject } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { BehaviorSubject, map, tap } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { SelectOption } from 'app/core/interfaces/SelectOption';
 
 @Component({
   selector: 'app-group-list',
   templateUrl: './group-list.component.html',
-  styleUrls: ['./group-list.component.scss']
+  styleUrls: ['./group-list.component.scss'],
 })
 export class GroupListComponent {
-  private _searchParamsSubject = new BehaviorSubject<GroupSearchReq>(new GroupSearchReq());
-  private _searchParams$ = this._searchParamsSubject.asObservable();
-
-  listGroups: IPagedModel<IGroupView>;
-  isLoading: boolean = false;
-  setOfCheckedId = new Set<number>();
   listPagesizeOption: number[] = [15, 30, 50, 100];
-  listOfSelection = [
+  listFleetOption: SelectOption[] = [{ label: 'All', value: '' }];
+  filterForm: FormGroup = new FormBuilder().group({
+    searchTerms: new FormControl<string>(''),
+    fleetId: new FormControl<string | null>(null),
+    modifiedOnly: new FormControl<boolean>(false),
+    duplicatesOnly: new FormControl<boolean>(false),
+    emptyOnly: new FormControl<boolean>(false),
+    page: new FormControl<number>(1),
+    pageSize: new FormControl<number>(this.listPagesizeOption[0]),
+  });
+
+  private _filterFormSubject = new BehaviorSubject<FormGroup>(this.filterForm);
+  private _filterForm$ = this._filterFormSubject.asObservable();
+
+  listGroups: PagedModel<GroupView>;
+  setOfCheckedId = new Set<number>();
+  listCheckSelection = [
     {
       text: 'Select groups having no device in this page',
       onSelect: () => {
-        this.listGroups.pageItemList.forEach(group => {
-          if (group.deviceCount == 0) this.setOfCheckedId.add(group.otapId)
+        this.listGroups.pageItemList.forEach((group) => {
+          if (group.deviceCount == 0) this.setOfCheckedId.add(group.otapId);
         });
         this.refreshCheckedStatus();
-      }
-    }
+      },
+    },
   ];
   checked = false;
+  isLoading: boolean = false;
   indeterminate = false;
-  filterForm: FormGroup;
+  isShowFilterModal = false;
+  isShowConfirmDeleteModal = false;
 
-  constructor(private groupService: GroupService) {
+  constructor(private _groupService: GroupService) {
     this.listGroups = {
       pageCount: 1,
-      pageItemList: []
+      pageItemList: [],
     };
 
-    this.filterForm = new FormBuilder().group({
-      searchTerms: [""],
-    });
+    this._filterForm$
+      .pipe(
+        tap((form) => {
+          if (form.controls['fleetId'].value == '') {
+            form.controls['fleetId'].setValue(null);
+          }
+          return form;
+        }),
+      )
+      .subscribe((searchParams) => {
+        this.fetchGroup(searchParams.value);
+      });
 
-    this._searchParams$.subscribe(searchParams => {
-      this.fetchGroup(searchParams);
+    this._groupService.getFleetSelectOptions().subscribe({
+      next: (options) => {
+        this.listFleetOption = [...this.listFleetOption, ...options];
+      }
     })
   }
 
   fetchGroup(searchParams: GroupSearchReq) {
     this.isLoading = true;
-    this.groupService.searchGroup(searchParams).subscribe({
+
+    this._groupService.searchGroup(searchParams).subscribe({
       next: (group) => {
         this.listGroups = group;
         this.isLoading = false;
+        this.refreshCheckedStatus();
       },
       error: () => {
         this.isLoading = false;
-      }
-    })
+      },
+    });
   }
 
   onItemChecked(optapId: number, isChecked: boolean) {
@@ -73,7 +99,7 @@ export class GroupListComponent {
 
   onAllChecked(isChecked: boolean) {
     if (isChecked) {
-      this.listGroups.pageItemList.forEach(group => this.setOfCheckedId.add(group.otapId));
+      this.listGroups.pageItemList.forEach((group) => this.setOfCheckedId.add(group.otapId));
     } else {
       this.setOfCheckedId.clear();
     }
@@ -81,44 +107,82 @@ export class GroupListComponent {
   }
 
   refreshCheckedStatus(): void {
-    this.checked = this.listGroups.pageItemList.every(item => this.setOfCheckedId.has(item.otapId));
-    this.indeterminate = this.listGroups.pageItemList.some(item => this.setOfCheckedId.has(item.otapId)) && !this.checked;
+    this.checked = this.listGroups.pageItemList.every((item) => this.setOfCheckedId.has(item.otapId));
+    this.indeterminate = (this.setOfCheckedId.size != 0 || this.listGroups.pageItemList.some((item) => this.setOfCheckedId.has(item.otapId))) && !this.checked;
   }
 
   handlePageChange(pageNumber: number) {
-    let currentParams = this.searchParams;
-    currentParams.page = pageNumber;
-    this._searchParamsSubject.next(currentParams);
+    this.filterForm.controls['page'].setValue(pageNumber);
+    this.startFilter();
   }
 
   handlePageSizeChange(pageSize: number) {
-    let currentParams = this.searchParams;
-    currentParams.pageSize = pageSize;
-    currentParams.page = 1;
-    this._searchParamsSubject.next(currentParams);
+    this.filterForm.controls['pageSize'].setValue(pageSize);
+    this.startFilter();
   }
 
   handleSearchChange(event: KeyboardEvent) {
-    if (event.code == "Enter") {
-      let currentParams = this.searchParams;
-      currentParams.searchTerms = this.filterForm.controls["searchTerms"].value;
-      currentParams.page = 1;
-      this._searchParamsSubject.next(currentParams)
+    if (event.code == 'Enter') {
+      this.filterForm.controls['page'].setValue(1);
+      this.startFilter();
     }
   }
 
-  resetSearchString() {
-    let currentParams = this.searchParams;
-    currentParams.searchTerms = "";
-    currentParams.page = 1;
-    this._searchParamsSubject.next(currentParams);
-  }
-
   get searchParams(): GroupSearchReq {
-    return this._searchParamsSubject.value;
+    return this.filterForm.value;
   }
 
-  get filterControl() {
-    return this.filterForm.controls;
+  showFilterModal(): void {
+    this.isShowFilterModal = true;
+  }
+
+  showConfirmDeleteModal(): void {
+    this.isShowConfirmDeleteModal = true;
+  }
+
+  handleCancelDelete(): void {
+    this.isShowConfirmDeleteModal = false;
+  }
+
+  startFilter(): void {
+    this._filterFormSubject.next(this.filterForm);
+  }
+
+  deleteGroup(): void {
+    this._groupService.deleteGroups(Array.from(this.setOfCheckedId), {
+      ifSuccessThen: () => {
+        this.fetchGroup(this.searchParams);
+        this.handleCancelDelete();
+        this.setOfCheckedId.clear();
+      },
+      ifErrorThen: (error) => {
+        console.log(error);        
+      }
+    })
+  };
+
+  handleCancelFilter(): void {
+    this.isShowFilterModal = false;
+  }
+
+  handleClearFilter(): void {
+    this.filterForm.reset({
+      duplicatesOnly: false,
+      emptyOnly: false,
+      fleetId: null,
+      modifiedOnly: false,
+      page: 1,
+      pageSize: this.listPagesizeOption[0],
+      searchTerms: '',
+    });
+    this.startFilter();
+  }
+
+  isAbleToDelete() : boolean {
+    return this.setOfCheckedId.size != 0;
+  }
+
+  isEditable() : boolean {
+    return this.setOfCheckedId.size == 1;
   }
 }

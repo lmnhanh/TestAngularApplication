@@ -34,7 +34,7 @@ export class AuthService {
   }
 
   logIn(request: ILoginRequest, ifSuccess: () => void): void {
-    this.authRequest.post<ILoginRequest, IAuthenticateResponse>("api/dt/user/login", request).subscribe({
+    this.authRequest.post<ILoginRequest, IAuthenticateResponse>("login", request).subscribe({
       next: (userInfo) => {
         this.storeUserToken(userInfo.token);
         this.saveToStorage("username", userInfo.userName);

@@ -1,3 +1,3 @@
-export interface IRequestParam {
+export interface RequestParam {
     [param: string]: string | number | boolean
 }

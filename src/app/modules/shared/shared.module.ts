@@ -15,6 +15,9 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzDropDownModule } from "ng-zorro-antd/dropdown";
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @NgModule({
     exports: [
@@ -34,7 +37,10 @@ import { NzDropDownModule } from "ng-zorro-antd/dropdown";
         NzCardModule,
         NzFormModule,
         ReactiveFormsModule,
-        NzDropDownModule
+        NzDropDownModule,
+        NzModalModule,
+        NzCheckboxModule,
+        NzSelectModule
     ],
     declarations: [
     ],

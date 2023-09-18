@@ -4,13 +4,7 @@
       <nz-form-item>
         <nz-form-control>
           <nz-input-group [nzSuffix]="suffixIconSearch" class="w-full">
-            <input
-              type="text"
-              formControlName="searchTerms"
-              nz-input
-              placeholder="Search group"
-              (keydown)="handleSearchChange($event)"
-            />
+            <input type="text" formControlName="searchTerms" nz-input placeholder="Search group" (keydown)="handleSearchChange($event)" />
           </nz-input-group>
           <ng-template #suffixIconSearch>
             <span nz-icon nzType="search"></span>
@@ -20,6 +14,90 @@
     </form>
   </div>
 </nz-dropdown-menu>
+
+<div class="mb-3 flex justify-between">
+  <div class="flex gap-2">
+    <button routerLink="/group/create" nz-button class="flex items-center" nzSize="large">
+      <span nz-icon nzType="plus" class="text-green-500"></span>
+      Create New
+    </button>
+    <button routerLink="/group/create" [disabled]="!isEditable()" nz-button class="flex items-center" nzSize="large">
+      <span nz-icon nzType="edit" class="text-blue-600"></span>
+      Edit
+    </button>
+    <button [disabled]="!isAbleToDelete()" (click)="showConfirmDeleteModal()" nz-button class="flex items-center" nzSize="large">
+      <span nz-icon nzType="delete" class="text-red-500"></span>
+      Delete
+    </button>
+  </div>
+
+  <button nz-button nzType="text" class="flex items-center" nzSize="large" (click)="showFilterModal()">
+    <span nz-icon nzType="filter"></span>
+  </button>
+</div>
+
+<nz-modal [(nzVisible)]="isShowConfirmDeleteModal" [nzFooter]="confirmDeleteModalFooter" nzTitle="Confirm delete" (nzOnCancel)="handleCancelDelete()">
+  <ng-container *nzModalContent>
+    <div>
+      Are you sure you want to delete the selected item(s)
+    </div>
+  </ng-container>
+</nz-modal>
+
+<ng-template #confirmDeleteModalFooter>
+  <button nz-button nzType="default" (click)="handleCancelDelete()">Cancel</button>
+  <button nz-button nzDanger="true" nzType="primary" (click)="deleteGroup()">Yes, Delete</button>
+</ng-template>
+
+<nz-modal [(nzVisible)]="isShowFilterModal" [nzFooter]="filterModalFooter" nzTitle="Filter Options" (nzOnCancel)="handleCancelFilter()">
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="filterForm">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" nzFor="email">Search terms</nz-form-label>
+        <nz-form-control>
+          <nz-input-group [nzSuffix]="suffixIconSearch" class="w-full">
+            <input type="text" formControlName="searchTerms" nz-input placeholder="Group name, ..." />
+          </nz-input-group>
+          <ng-template #suffixIconSearch>
+            <span nz-icon nzType="search"></span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" nzFor="email">Fleet</nz-form-label>
+        <nz-form-control>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a fleet" formControlName="fleetId">
+            <nz-option *ngFor="let option of listFleetOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+          </nz-select>
+          <ng-template #suffixIconSearch>
+            <span nz-icon nzType="search"></span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" nzFor="email">Options</nz-form-label>
+        <nz-form-control>
+          <div nz-row>
+            <div nz-col nzSpan="8">
+              <label nz-checkbox formControlName="duplicatesOnly">Empty</label>
+            </div>
+            <div nz-col nzSpan="8">
+              <label nz-checkbox formControlName="modifiedOnly">Modified</label>
+            </div>
+            <div nz-col nzSpan="8">
+              <label nz-checkbox formControlName="duplicatesOnly">Duplicated</label>
+            </div>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>
+
+<ng-template #filterModalFooter>
+  <button nz-button nzType="default" (click)="handleClearFilter()">Clear</button>
+  <button nz-button nzType="primary" (click)="startFilter()">Ok</button>
+</ng-template>
 
 <nz-table
   [nzData]="listGroups.pageItemList"
@@ -33,24 +111,14 @@
   class="bg-white"
   [nzPageSize]="searchParams.pageSize"
   [nzPageSizeOptions]="listPagesizeOption"
-  [nzLoading]="isLoading"
->
+  [nzLoading]="isLoading">
   <thead>
     <tr>
-      <th
-        [nzSelections]="listOfSelection"
-        [(nzChecked)]="checked"
-        [nzIndeterminate]="indeterminate"
-        (nzCheckedChange)="onAllChecked($event)"
-      ></th>
+      <th [nzSelections]="listCheckSelection" [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
       <th></th>
       <th nzCustomFilter>
         Name
-        <nz-filter-trigger
-          [nzVisible]="false"
-          [nzActive]="true"
-          [nzDropdownMenu]="menu"
-        >
+        <nz-filter-trigger [nzVisible]="false" [nzActive]="true" [nzDropdownMenu]="menu">
           <span nz-icon nzType="search"></span>
         </nz-filter-trigger>
       </th>
@@ -62,38 +130,29 @@
   </thead>
   <tbody>
     <tr *ngFor="let group of listGroups.pageItemList">
-      <td
-        [nzChecked]="setOfCheckedId.has(group.otapId)"
-        (nzCheckedChange)="onItemChecked(group.otapId, $event)"
-      ></td>
+      <td [nzChecked]="setOfCheckedId.has(group.otapId)" (nzCheckedChange)="onItemChecked(group.otapId, $event)"></td>
       <td>
-        <ng-template *ngIf="group.devicesWithDuplicateValues != 0">
+        <ng-container *ngIf="group.devicesWithDuplicateValues != 0">
           <span
             class="w-6 h-6 text-blue-500"
-            nzTooltipTitle="Group contains {{
-              group.devicesWithDuplicateValues
-            }} devices with duplicate values"
+            nzTooltipTitle="Group contains {{ group.devicesWithDuplicateValues }} devices with duplicate values"
             [nzTooltipPlacement]="['topLeft', 'leftTop']"
             nz-tooltip
             nz-icon
             nzType="warning"
-            nzTheme="outline"
-          ></span>
-        </ng-template>
-        <ng-template *ngIf="group.devicesWithEmptyValues != 0">
+            nzTheme="outline"></span>
+        </ng-container>
+        <ng-container *ngIf="group.devicesWithEmptyValues != 0">
           <span
             class="w-6 h-6 text-orange-700"
-            nzTooltipTitle="Group contains {{
-              group.devicesWithEmptyValues
-            }} devices with empty values"
+            nzTooltipTitle="Group contains {{ group.devicesWithEmptyValues }} devices with empty values"
             [nzTooltipPlacement]="['topLeft', 'leftTop']"
             nz-tooltip
             nz-icon
             nzType="question-circle"
-            nzTheme="outline"
-          ></span>
-        </ng-template>
-        <ng-template *ngIf="group.hasGroupConfigurationError">
+            nzTheme="outline"></span>
+        </ng-container>
+        <ng-container *ngIf="group.hasGroupConfigurationError">
           <span
             class="w-6 h-6 text-red-600"
             nzTooltipTitle="Failed to generate group configuration"
@@ -101,29 +160,23 @@
             nz-tooltip
             nz-icon
             nzType="close-circle"
-            nzTheme="outline"
-          ></span>
-        </ng-template>
-        <ng-template *ngIf="group.pendingNewDevices">
-            <span
-              class="w-6 h-6 text-cyan-600"
-              nzTooltipTitle="Group contains {{group.pendingNewDevices}} changes pending approval"
-              [nzTooltipPlacement]="['topLeft', 'leftTop']"
-              nz-tooltip
-              nz-icon
-              nzType="check-circle"
-              nzTheme="outline"
-            ></span>
-        </ng-template>
+            nzTheme="outline"></span>
+        </ng-container>
+        <ng-container *ngIf="group.hasChanges">
+          <span
+            class="w-6 h-6 text-cyan-600"
+            nzTooltipTitle="Group contains changes pending approval"
+            [nzTooltipPlacement]="['topLeft', 'leftTop']"
+            nz-tooltip
+            nz-icon
+            nzType="check-circle"
+            nzTheme="outline"></span>
+        </ng-container>
       </td>
       <td>{{ group.name }}</td>
       <td>
-        <nz-badge
-          *ngIf="group.desiredConfigurationId"
-          nzStandalone
-          [nzCount]="group.desiredConfigurationId"
-        ></nz-badge>
-        {{ group.desiredConfigurationDesc ?? "None" }}
+        <nz-badge *ngIf="group.desiredConfigurationId" nzStandalone [nzCount]="group.desiredConfigurationId"></nz-badge>
+        {{ group.desiredConfigurationDesc ?? 'None' }}
       </td>
       <td>
         <nz-progress [nzPercent]="group.progressBarPercent1"></nz-progress>

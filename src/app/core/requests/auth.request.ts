@@ -7,6 +7,6 @@ import { BaseApiRequest } from "./base.request";
 })
 export class AuthApiRequest extends BaseApiRequest{
     constructor(httpClient: HttpClient){
-        super(httpClient, 'https://localhost:44329');
+        super(httpClient, 'https://localhost:44329/api/dt/user');
     }
 }
