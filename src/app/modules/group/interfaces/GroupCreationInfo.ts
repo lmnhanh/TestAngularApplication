@@ -1,9 +1,9 @@
-import { CustomizationProfileModel } from "app/modules/shared/interfaces/CustomizationProfileModel";
-import { DeviceFormationInfo } from "app/modules/shared/interfaces/DeviceFormationInfo";
-import { FleetView } from "app/modules/shared/interfaces/FleetView";
+import { CustomizationProfileModel } from 'app/shared/interfaces/CustomizationProfileModel';
+import { DeviceFormationInfo } from 'app/shared/interfaces/DeviceFormationInfo';
+import { Fleet } from 'app/shared/interfaces/Fleet';
 
 export interface GroupCreationInfo {
-    deviceFormationInfo : DeviceFormationInfo[];
-    customizationProfileModels: CustomizationProfileModel[];
-    fleets: FleetView[];
+  deviceFormationInfo: DeviceFormationInfo[];
+  customizationProfileModels: CustomizationProfileModel[];
+  fleets: Fleet[];
 }

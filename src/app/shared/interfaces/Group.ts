@@ -1,4 +1,4 @@
-export interface GroupView {
+export interface Group {
     otapId : number;
     name :string;
     desiredConfigurationDesc: number | null;

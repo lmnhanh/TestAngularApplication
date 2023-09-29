@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { GroupSearchReq } from '../../models/GroupSearchReq';
 import { PagedModel } from 'app/core/interfaces/PagedModel';
-import { GroupView } from '../../../shared/interfaces/GroupView';
 import { GroupService } from '../../services/group.service';
 import { BehaviorSubject, map, tap } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SelectOption } from 'app/core/interfaces/SelectOption';
+import { Group } from 'app/shared/interfaces/Group';
 
 @Component({
   selector: 'app-group-list',
@@ -28,7 +28,7 @@ export class GroupListComponent {
   private _filterFormSubject = new BehaviorSubject<FormGroup>(this.filterForm);
   private _filterForm$ = this._filterFormSubject.asObservable();
 
-  listGroups: PagedModel<GroupView>;
+  listGroups: PagedModel<Group>;
   setOfCheckedId = new Set<number>();
   listCheckSelection = [
     {

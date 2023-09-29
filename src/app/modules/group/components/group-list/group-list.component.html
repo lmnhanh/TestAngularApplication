@@ -38,9 +38,7 @@
 
 <nz-modal [(nzVisible)]="isShowConfirmDeleteModal" [nzFooter]="confirmDeleteModalFooter" nzTitle="Confirm delete" (nzOnCancel)="handleCancelDelete()">
   <ng-container *nzModalContent>
-    <div>
-      Are you sure you want to delete the selected item(s)
-    </div>
+    <div>Are you sure you want to delete the selected item(s)</div>
   </ng-container>
 </nz-modal>
 
@@ -53,7 +51,7 @@
   <ng-container *nzModalContent>
     <form nz-form [formGroup]="filterForm">
       <nz-form-item>
-        <nz-form-label [nzSm]="6" nzFor="email">Search terms</nz-form-label>
+        <nz-form-label [nzSm]="6">Search terms</nz-form-label>
         <nz-form-control>
           <nz-input-group [nzSuffix]="suffixIconSearch" class="w-full">
             <input type="text" formControlName="searchTerms" nz-input placeholder="Group name, ..." />
@@ -64,7 +62,7 @@
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
-        <nz-form-label [nzSm]="6" nzFor="email">Fleet</nz-form-label>
+        <nz-form-label [nzSm]="6">Fleet</nz-form-label>
         <nz-form-control>
           <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a fleet" formControlName="fleetId">
             <nz-option *ngFor="let option of listFleetOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
@@ -75,7 +73,7 @@
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
-        <nz-form-label [nzSm]="6" nzFor="email">Options</nz-form-label>
+        <nz-form-label [nzSm]="6">Options</nz-form-label>
         <nz-form-control>
           <div nz-row>
             <div nz-col nzSpan="8">
@@ -129,7 +127,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let group of listGroups.pageItemList">
+    <tr *ngFor="let group of listGroups.pageItemList" [ngClass]="setOfCheckedId.has(group.otapId) ? 'bg-slate-100' : ''">
       <td [nzChecked]="setOfCheckedId.has(group.otapId)" (nzCheckedChange)="onItemChecked(group.otapId, $event)"></td>
       <td>
         <ng-container *ngIf="group.devicesWithDuplicateValues != 0">
@@ -173,7 +171,9 @@
             nzTheme="outline"></span>
         </ng-container>
       </td>
-      <td>{{ group.name }}</td>
+      <td>
+        <a class="text-blue-600" [routerLink]="['/','group', 'details', group.otapId]">{{ group.name }}</a>
+      </td>
       <td>
         <nz-badge *ngIf="group.desiredConfigurationId" nzStandalone [nzCount]="group.desiredConfigurationId"></nz-badge>
         {{ group.desiredConfigurationDesc ?? 'None' }}

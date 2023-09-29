@@ -1,3 +1,9 @@
+<div class="mb-2">
+  <button nz-button [nzLoading]="isSubmiting" [disabled]="!createForm.valid" class="flex items-center" nzType="primary" (click)="createGroup()">
+    <i nz-icon nzType="plus"></i>
+    Create
+  </button>
+</div>
 <form nz-form [formGroup]="createForm" class="flex flex-col items-center">
   <nz-form-item class="w-full lg:w-1/2">
     <nz-form-label nzLabelAlign="left" nzRequired [nzSm]="24" [nzLg]="8">Device Formation Type</nz-form-label>
@@ -64,14 +70,4 @@
       </ng-template>
     </nz-form-control>
   </nz-form-item>
-  <button
-    nz-button
-    [nzLoading]="isSubmiting"
-    [disabled]="!createForm.valid"
-    class="flex items-center self-cente"
-    nzType="primary"
-    (click)="createGroup()">
-    <i nz-icon nzType="plus"></i>
-    Create
-  </button>
 </form>

@@ -1,0 +1,360 @@
+<div class="fixed w-full bg-white z-50">
+  <button
+    nz-button
+    nzSize="large"
+    class="flex items-center"
+    nzType="primary"
+    [nzLoading]="isUpdating"
+    [disabled]="!updateForm.dirty || !updateForm.valid"
+    (click)="updateGroup()">
+    <i nz-icon nzType="edit"></i>
+    Update
+  </button>
+</div>
+<!-- <ng-template let-description #emptyCollection>
+  <ng-container *ngTemplateOutlet="inner; context:{name:foo}"></ng-container>
+  <app-empty-collection [description]="description"></app-empty-collection>
+</ng-template> -->
+
+<form nz-form [formGroup]="updateForm" class="pt-10">
+  <!--Details section-->
+  <nz-divider nzText="Group Details" nzOrientation="left"></nz-divider>
+  <div class="w-3/4">
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Group ID</nz-form-label>
+      <nz-form-control>
+        <div>{{ groupDetailed?.otapId }}</div>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Device Formation</nz-form-label>
+      <nz-form-control>
+        <div>{{ groupDetailed?.deviceFormationTypeDescription }}</div>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Name</nz-form-label>
+      <nz-form-control [nzSm]="18" nzHasFeedback [nzErrorTip]="userErrorTpl">
+        <input type="text" nz-input formControlName="name" placeholder="Ex: SouthEast Asia" />
+      </nz-form-control>
+      <ng-template #userErrorTpl let-control>
+        <ng-container *ngIf="control.hasError('required')">Please input the fleet's name</ng-container>
+      </ng-template>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Description</nz-form-label>
+      <nz-form-control [nzSm]="18">
+        <nz-textarea-count [nzMaxCharacterCount]="255">
+          <textarea formControlName="description" nz-input rows="4" placeholder="More description ..."></textarea>
+        </nz-textarea-count>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Fleet</nz-form-label>
+      <nz-form-control>
+        <nz-select nzShowSearch nzPlaceHolder="Select a fleet" formControlName="fleetId">
+          <nz-option *ngFor="let option of listFleetOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+
+  <!--Devices section-->
+  <nz-divider nzText="Devices" nzOrientation="left"></nz-divider>
+  <div class="w-3/4">
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Devices</nz-form-label>
+      <nz-form-control>
+        <a class="text-blue-600" routerLink="/">{{ groupDetailed?.totalDeviceCount }} {{ groupDetailed?.deviceFormationDescription }}</a>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-control nz-row>
+        <div class="flex gap-x-2" nz-col nzSpan="18" nzOffset="6">
+          <button nz-button class="flex items-center" nzType="primary">
+            <span nz-icon nzType="file-zip" nzTheme="outline"></span>
+            Report
+          </button>
+          <button nz-button class="flex items-center" nzType="primary">
+            <i nz-icon nzType="export"></i>
+            Export
+          </button>
+          <button nz-button class="flex items-center" nzType="primary">
+            <i nz-icon nzType="import"></i>
+            Import
+          </button>
+        </div>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">Configuration</nz-form-label>
+      <nz-form-control>
+        <div class="gap-x-2">
+          <nz-progress [nzPercent]="groupDetailed?.progressBarPercent1" [nzFormat]="percentFormat"></nz-progress>
+        </div>
+        <ng-template #percentFormat let-percent> {{ percent }}% up to date </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-control nz-row>
+        <div class="flex flex-col" nz-col nzSpan="18" nzOffset="6">
+          <a class="text-green-600">{{ groupDetailed?.latestVersionDeviceCount }} Device(s) using lastest version</a>
+          <a class="text-gray-600">{{ groupDetailed?.outOfDateDeviceCount }} Device(s) out of date</a>
+        </div>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item class="mb-2">
+      <nz-form-label [nzSm]="6" class="font-bold">OTAP</nz-form-label>
+      <nz-form-control>
+        <div class="flex flex-col">
+          <a class="text-blue-600">{{ groupDetailed?.otapInProgressDeviceCount }} Device(s) available for OTAP</a>
+          <a class="text-blue-600">{{ groupDetailed?.readyForOtapDevicesCount }} Device(s) initiated</a>
+        </div>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+
+  <!--Configuration section-->
+  <nz-divider nzText="Group Configuration" nzOrientation="left"></nz-divider>
+  <nz-tabset nzType="card" nzTabPosition="top" nzCentered [nzAnimated]="true">
+    <nz-tab nzTitle="Draft">
+      <div class="w-3/4">
+        <nz-form-item class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Version</nz-form-label>
+          <nz-form-control>
+            <nz-badge nzStandalone [nzCount]="groupDetailed?.draftConfiguration?.version ?? 1"></nz-badge>
+            <span *ngIf="groupDetailed?.devicesWithEmptyValues != 0">
+              Group contains {{ groupDetailed?.devicesWithEmptyValues }} device(s) with empty value
+            </span>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Description</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-textarea-count [nzMaxCharacterCount]="255">
+              <textarea formControlName="draftConfigurationDescription" nz-input rows="4" placeholder="Draft description ..."></textarea>
+            </nz-textarea-count>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Customization Profile</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzShowSearch nzPlaceHolder="Select a customization profile" formControlName="draftCustomizationProfileId">
+              <nz-option *ngFor="let option of customizationProfileOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="groupDetailed?.draftConfiguration?.programmingFiles?.length != 0" class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Firmware Release</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select
+              nzShowSearch
+              nzPlaceHolder="Select a customization profile"
+              formControlName="draftCustomizationProfileId"
+              (ngModelChange)="handleFirmwareChange($event)">
+              <nz-option *ngFor="let option of firmwareOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76">
+            <button nz-button title="Import" nzType="text">
+              <span nz-icon nzType="upload"></span>
+            </button>
+          </nz-upload>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="groupDetailed?.draftConfiguration?.programmingFiles?.length != 0" class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Programing File</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <a class="text-blue-600 flex items-center">
+              {{ (groupDetailed?.draftConfiguration)!.programmingFiles[0].fileName }}
+              ({{ (groupDetailed?.draftConfiguration)!.programmingFiles[0].programmingFileSUFI }})
+              <span nz-icon nzType="download"></span>
+            </a>
+          </nz-form-control>
+          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76">
+            <button nz-button title="Import" nzType="text">
+              <span nz-icon nzType="upload"></span>
+            </button>
+          </nz-upload>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="groupDetailed?.draftConfiguration?.programmingFiles?.length != 0" class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Programming Application</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzShowSearch nzPlaceHolder="Select a customization profile" formControlName="draftProgrammingApplicationId">
+              <nz-option *ngFor="let option of programmingApplicationOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76">
+            <button nz-button title="Import" nzType="text">
+              <span nz-icon nzType="upload"></span>
+            </button>
+          </nz-upload>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="groupDetailed?.draftConfiguration?.programmingFiles?.length != 0" class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Calibration Application</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzShowSearch nzPlaceHolder="Select a customization profile" formControlName="draftCalibrationApplicationId">
+              <nz-option *ngFor="let option of calibrationApplicationOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76">
+            <button nz-button title="Import" nzType="text">
+              <span nz-icon nzType="upload"></span>
+            </button>
+          </nz-upload>
+        </nz-form-item>
+
+        <nz-form-item class="mb-2">
+          <nz-form-control nz-row>
+            <label nz-col nzOffset="6" nz-checkbox formControlName="draftConfigurationIsMandatory"> Treat configuration as mandatory </label>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item *ngIf="groupDetailed?.draftConfiguration?.programmingFiles?.length != 0" class="mb-2">
+          <nz-form-label [nzSm]="6" class="font-bold">Required feature license keys</nz-form-label>
+          <nz-form-control [nzSm]="18">
+            <nz-select nzShowSearch nzMode="multiple" nzPlaceHolder="Select Feature License Keys" formControlName="draftRequiredFeatureIds">
+              <nz-option *ngFor="let option of requiredFeatureLicenseOption" [nzLabel]="option.label" [nzValue]="option.value"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item class="mb-2">
+          <nz-form-control nz-row>
+            <div class="flex gap-x-2 justify-between" nz-col nzSpan="18" nzOffset="6">
+              <button [disabled]="!groupDetailed?.hasPendingGroupConfigChanges" nz-button class="flex items-center" nzType="primary">
+                <span nz-icon nzType="check" nzTheme="outline"></span>
+                Approve
+              </button>
+              <button nz-button class="flex items-center" nzType="primary" *ngIf="groupDetailed?.draftConfiguration?.selectedFeatures?.length != 0">
+                <span nz-icon nzType="file-zip" nzTheme="outline"></span>
+                Export group member serial numbers
+              </button>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </nz-tab>
+    <nz-tab nzTitle="Approved">
+      <ng-template nz-tab>
+        <div class="w-3/4">
+          <ng-container *ngIf="groupDetailed?.desiredConfiguration != null; else noDesiredConfiguration">
+            <ng-container *ngTemplateOutlet="configuration; context: { $implicit: groupDetailed?.desiredConfiguration }"></ng-container>
+          </ng-container>
+        </div>
+        <ng-template #noDesiredConfiguration>
+          <app-empty-collection description="There is as yet no approved group configuration"></app-empty-collection>
+        </ng-template>
+      </ng-template>
+    </nz-tab>
+    <nz-tab nzTitle="History">
+      <ng-template nz-tab>
+        <div class="w-3/4">
+          <ng-container *ngIf="groupDetailed?.desiredConfiguration != null; else noHistoryConfiguration">
+            <nz-collapse nzBordered="false" nzGhost="true">
+              <nz-collapse-panel *ngFor="let conf of groupDetailed?.configurationHistory" [nzHeader]="conf.version.toString()">
+                <div class="w-3/4">
+                  <ng-container *ngTemplateOutlet="configuration; context: { $implicit: conf }"></ng-container>
+                </div>
+              </nz-collapse-panel>
+            </nz-collapse>
+          </ng-container>
+        </div>
+        <ng-template #noHistoryConfiguration>
+          <app-empty-collection description="There is as yet no approved group configuration"></app-empty-collection>
+        </ng-template>
+      </ng-template>
+    </nz-tab>
+  </nz-tabset>
+</form>
+
+<ng-template let-conf #configuration>
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Version</nz-form-label>
+    <nz-form-control>
+      <nz-badge nzStandalone [nzCount]="conf.version ?? 1" [nzStyle]="{ backgroundColor: '#52c41a' }"></nz-badge>
+      {{ conf.activationDate | date : 'short' }} Actived
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Description</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      {{ conf.description }}
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Customization Profile</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      {{ conf.customizationProfile.name }}
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Firmware Release</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      <a class="text-blue-600">
+        {{ conf!.firmware.version }}
+      </a>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Programing File</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      <a class="text-blue-600 flex items-center">
+        {{ conf!.programmingFiles[0].fileName }}
+        ({{ conf!.programmingFiles[0].programmingFileSUFI }})
+        <span nz-icon nzType="download"></span>
+      </a>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Programming Application</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      <a class="text-blue-600">
+        {{ conf!.calibrationApplication.displayName }}
+      </a>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item *ngIf="conf.programmingFiles?.length != 0" class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Calibration Application</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      <a class="text-blue-600">
+        {{ conf!.programmingApplication.displayName }}
+      </a>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="mb-2">
+    <nz-form-control nz-row>
+      <div nz-col nzOffset="6">
+        <span nzDisabled="true" [nzChecked]="conf.isMandatory" nz-checkbox></span>
+        Treat configuration as mandatory
+      </div>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item *ngIf="conf.programmingFiles?.length != 0" class="mb-2">
+    <nz-form-label [nzSm]="6" class="font-bold">Required feature license keys</nz-form-label>
+    <nz-form-control [nzSm]="18">
+      <div *ngFor="let feature of conf!.selectedFeatures">{{ feature.featureId }} - {{ feature.description }}</div>
+    </nz-form-control>
+  </nz-form-item>
+</ng-template>

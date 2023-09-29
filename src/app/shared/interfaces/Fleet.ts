@@ -1,4 +1,4 @@
-export interface FleetView {
+export interface Fleet {
     id: string;
     shortName : string;
     fullName : string;

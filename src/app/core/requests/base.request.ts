@@ -1,9 +1,10 @@
 import { Observable } from 'rxjs';
-import { ApiRequest } from '../interfaces/ApiRequest';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { RequestParam } from '../interfaces/RequestParam';
+import { AuthService } from 'app/modules/auth/services/auth.service';
+import { DEFAULT_AUTHORIZATION_SCHEMA } from '../const/defaultAuthorizationType';
 
-export abstract class BaseApiRequest implements ApiRequest {
+export abstract class BaseApiRequest {
   protected httpClient: HttpClient;
   protected baseUrl: string;
 
@@ -20,6 +21,12 @@ export abstract class BaseApiRequest implements ApiRequest {
 
   post<TReq, TRes>(path: string, body: TReq, params?: RequestParam): Observable<TRes> {
     return this.httpClient.post<TRes>(`${this.baseUrl}/${path}`, body, {
+      params: new HttpParams({ fromObject: params }),
+    });
+  }
+
+  put<TReq, TRes>(path: string, body: TReq, params?: RequestParam): Observable<TRes> {
+    return this.httpClient.put<TRes>(`${this.baseUrl}/${path}`, body, {
       params: new HttpParams({ fromObject: params }),
     });
   }

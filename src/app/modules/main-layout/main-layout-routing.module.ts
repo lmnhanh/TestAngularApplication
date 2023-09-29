@@ -9,7 +9,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('../group/group.module').then(m => m.GroupModule)
+        loadChildren: () => import('../group/group.module').then(m => m.GroupModule),
       },
       {
         path: 'group',
