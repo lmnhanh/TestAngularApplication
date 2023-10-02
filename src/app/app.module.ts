@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { SharedModule } from './shared/shared.module';
 import { StoreModule } from '@ngrx/store';
+import { booksReducer } from './core/store/reducers/book.reducer';
 
 registerLocaleData(en);
 
@@ -22,7 +23,7 @@ registerLocaleData(en);
     AppRoutingModule,
     BrowserAnimationsModule,
     SharedModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ books: booksReducer}),
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
