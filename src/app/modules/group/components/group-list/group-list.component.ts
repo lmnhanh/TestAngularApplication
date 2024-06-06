@@ -100,7 +100,7 @@ export class GroupListComponent {
       totalPages: 1,
       pageSize: 20,
       currentPage: 1,
-      totalItems: 0,
+      totalItems: 100,
       items: fakeGroups,
     };
     this.isLoading = false;
