@@ -3,6 +3,8 @@ import { GroupCreationInfo } from '../../interfaces/GroupCreationInfo';
 import { GroupService } from '../../services/group.service';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { SelectOption } from 'app/core/interfaces/SelectOption';
+import { BreadCrumService } from 'app/modules/main-layout/services/BreadCrumService';
+import { BreadCrumItem } from 'app/shared/components/breadcrum/breadcrum.component';
 
 @Component({
   selector: 'app-group-create-form',
@@ -32,7 +34,7 @@ export class GroupCreateFormComponent {
     customizationProfileId: new FormControl<string>(''),
   });
 
-  constructor(private _groupServices: GroupService) {
+  constructor(private _groupServices: GroupService, _breadCrum: BreadCrumService) {
     this.isLoadingData = true;
     this._groupServices.getGroupCreationInfo().subscribe({
       next: (creationInfo) => {
@@ -44,11 +46,12 @@ export class GroupCreateFormComponent {
         this.isLoadingData = false;
       },
     });
+    _breadCrum.next(new BreadCrumItem(-1, "Create group", "/group/create"))
   }
 
   initFormDefaultValue(){
     console.log(this.groupCreationInfo);
-  
+
     this.deviceFormationTypeOptions = this.groupCreationInfo.deviceFormationInfo?.map((formation) => ({
       label: formation.description,
       value: formation.id.toString(),

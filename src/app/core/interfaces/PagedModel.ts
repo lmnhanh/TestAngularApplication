@@ -1,4 +1,7 @@
 export interface PagedModel<T> {
-    pageItemList: T[];
-    pageCount: number;
+    pageSize: number,
+    currentPage: number,
+    totalItems: number,
+    totalPages: number,
+    items: T[]
 }

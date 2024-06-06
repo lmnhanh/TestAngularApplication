@@ -6,6 +6,9 @@ import { BehaviorSubject, map, tap } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SelectOption } from 'app/core/interfaces/SelectOption';
 import { Group } from 'app/shared/interfaces/Group';
+import { BreadCrumService } from 'app/modules/main-layout/services/BreadCrumService';
+import { BreadCrumItem } from 'app/shared/components/breadcrum/breadcrum.component';
+import { fakeGroups } from 'app/shared/data/groups';
 
 @Component({
   selector: 'app-group-list',
@@ -34,7 +37,7 @@ export class GroupListComponent {
     {
       text: 'Select groups having no device in this page',
       onSelect: () => {
-        this.listGroups.pageItemList.forEach((group) => {
+        this.listGroups.items.forEach((group) => {
           if (group.deviceCount == 0) this.setOfCheckedId.add(group.otapId);
         });
         this.refreshCheckedStatus();
@@ -47,11 +50,16 @@ export class GroupListComponent {
   isShowFilterModal = false;
   isShowConfirmDeleteModal = false;
 
-  constructor(private _groupService: GroupService) {
+  constructor(private _groupService: GroupService, _breadCrum: BreadCrumService) {
     this.listGroups = {
-      pageCount: 1,
-      pageItemList: [],
+      totalPages: 1,
+      pageSize: 20,
+      currentPage: 1,
+      totalItems: 0,
+      items: [],
     };
+
+    _breadCrum.next(new BreadCrumItem(1, "Groups", "/group"))
 
     this._filterForm$
       .pipe(
@@ -76,16 +84,26 @@ export class GroupListComponent {
   fetchGroup(searchParams: GroupSearchReq) {
     this.isLoading = true;
 
-    this._groupService.searchGroup(searchParams).subscribe({
-      next: (group) => {
-        this.listGroups = group;
-        this.isLoading = false;
-        this.refreshCheckedStatus();
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
+    //Fecth from real API
+    // this._groupService.searchGroup(searchParams).subscribe({
+    //   next: (group) => {
+    //     this.listGroups = group;
+    //     this.isLoading = false;
+    //     this.refreshCheckedStatus();
+    //   },
+    //   error: () => {
+    //     this.isLoading = false;
+    //   },
+    // });
+
+    this.listGroups = {
+      totalPages: 1,
+      pageSize: 20,
+      currentPage: 1,
+      totalItems: 0,
+      items: fakeGroups,
+    };
+    this.isLoading = false;
   }
 
   onItemChecked(optapId: number, isChecked: boolean) {
@@ -99,7 +117,7 @@ export class GroupListComponent {
 
   onAllChecked(isChecked: boolean) {
     if (isChecked) {
-      this.listGroups.pageItemList.forEach((group) => this.setOfCheckedId.add(group.otapId));
+      this.listGroups.items.forEach((group) => this.setOfCheckedId.add(group.otapId));
     } else {
       this.setOfCheckedId.clear();
     }
@@ -107,8 +125,8 @@ export class GroupListComponent {
   }
 
   refreshCheckedStatus(): void {
-    this.checked = this.listGroups.pageItemList.every((item) => this.setOfCheckedId.has(item.otapId));
-    this.indeterminate = (this.setOfCheckedId.size != 0 || this.listGroups.pageItemList.some((item) => this.setOfCheckedId.has(item.otapId))) && !this.checked;
+    this.checked = this.listGroups.items.every((item) => this.setOfCheckedId.has(item.otapId));
+    this.indeterminate = (this.setOfCheckedId.size != 0 || this.listGroups.items.some((item) => this.setOfCheckedId.has(item.otapId))) && !this.checked;
   }
 
   handlePageChange(pageNumber: number) {
@@ -156,7 +174,7 @@ export class GroupListComponent {
         this.setOfCheckedId.clear();
       },
       ifErrorThen: (error) => {
-        console.log(error);        
+        console.log(error);
       }
     })
   };

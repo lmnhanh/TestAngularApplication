@@ -3,21 +3,23 @@ import { StorageService } from "../storage/StorageService";
 export class AuthenticatedUser {
   public storage: StorageService | null = null;
 
-  constructor() {
-    this._username = "";
-    this._fullname = null;
+  constructor(stogare : StorageService | null) {
+    this._name = "";
+    this._email= "";
     this._roles = [];
     this._token = null;
+
+    this.storage = stogare
   }
 
-  private _username!: string;
-  private _fullname: string | null;
+  private _name!: string;
+  private _email: string | null;
   private _roles: string[] = [];
   private _token: string | null;
 
   clear(): void{
-    this._username = "";
-    this._fullname = null;
+    this._name = "";
+    this._email = "";
     this._roles = [];
     this._token = null;
   }
@@ -30,17 +32,19 @@ export class AuthenticatedUser {
   }
 
   get username(): string {
-    if (this._username == "") {
-      this._username = this.storage?.get("username") ?? "";
+    if (this._name == "") {
+      this._name = this.storage?.get("name") ?? "";
     }
-    return this._username;
+    return this._name;
   }
+
   get fullname(): string | null {
-    if (this._fullname == null) {
-      this._fullname = this.storage?.get("fullname") ?? null;
+    if (this._email == null) {
+      this._email = this.storage?.get("email") ?? null;
     }
-    return this._fullname;
+    return this._email;
   }
+
   get roles(): string[] {
     if (this._roles.length == 0) {
       this._roles = this.storage?.get("roles")?.split(',') ?? [];

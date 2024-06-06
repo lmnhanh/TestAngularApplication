@@ -1,45 +1,53 @@
 <nz-layout class="app-layout">
-    <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
-        [nzTrigger]="null">
-        <div class="sidebar-logo">
-            <a routerLink="/">
-                <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
-                <h1>Test Angular</h1>
-            </a>
-        </div>
-        <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-            <li nz-submenu nzOpen nzTitle="Group" nzIcon="group" nzTheme="outline">
-                <ul>
-                    <li nz-menu-item nzMatchRouter>
-                        <a routerLink="/group/list">List Of Groups</a>
-                    </li>
-                </ul>
-            </li>
-            <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
-                <ul>
-                    <li nz-menu-item nzMatchRouter>
-                        <a>Basic Form</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </nz-sider>
-    <div class="fixed flex justify-between items-center z-10 bg-white w-full"
-        [class]="isCollapsed ? 'pl-[80px]':'pl-[256px]'">
-        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
-            <span class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></span>
-        </span>
-        <div class="">
-            <button class="flex items-center" nz-button nzType="primary" nzShape="round" (click)="logOut()">
-                {{user?.fullname ?? ""}}
-            </button>
-        </div>
+  <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="null">
+    <div class="sidebar-logo">
+      <a routerLink="/">
+        <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
+        <h1>Test Angular</h1>
+      </a>
     </div>
-    <nz-layout [class]="isCollapsed ? 'ml-[80px]':'ml-[256px]'" class="z-0 pt-12 bg-white">
-        <nz-content>
-            <div class="inner-content">
-                <router-outlet></router-outlet>
-            </div>
-        </nz-content>
-    </nz-layout>
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <li nz-submenu nzOpen nzTitle="Group" nzIcon="group" nzTheme="outline">
+        <ul>
+          <li nz-menu-item nzMatchRouter>
+            <a routerLink="/group/list">List Of Groups</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
+        <ul>
+          <li nz-menu-item nzMatchRouter>
+            <a routerLink="/book">Basic Form</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu nzOpen nzTitle="User" nzIcon="form">
+        <ul>
+          <li nz-menu-item nzMatchRouter>
+            <a routerLink="/user">Users</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nz-sider>
+  <div class="fixed flex justify-between items-center z-10 bg-white w-full"
+    [class]="isCollapsed ? 'pl-[80px]':'pl-[256px]'">
+    <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+      <span class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></span>
+    </span>
+    <div class="">
+      <button class="flex items-center" nz-button nzType="primary" nzShape="round" (click)="logOut()">
+        {{user?.username ?? ""}}
+      </button>
+    </div>
+  </div>
+  <nz-layout [class]="isCollapsed ? 'ml-[80px]':'ml-[256px]'" class="z-0 pt-12 bg-white">
+    <nz-content>
+      <app-breadcrum [items]="breadCrums"></app-breadcrum>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
 </nz-layout>

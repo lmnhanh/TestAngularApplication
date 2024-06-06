@@ -23,9 +23,13 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { EmptyCollectionComponent } from './components/empty-collection/empty-collection.component';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { BreadcrumComponent } from './components/breadcrum/breadcrum.component';
 
 @NgModule({
-  imports: [NzEmptyModule],
+  imports: [
+    NzEmptyModule,
+    BreadcrumComponent
+  ],
   exports: [
     FormsModule,
     CommonModule,
@@ -52,6 +56,7 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
     NzEmptyModule,
     NzCollapseModule,
     EmptyCollectionComponent,
+    BreadcrumComponent,
   ],
   declarations: [EmptyCollectionComponent],
 })

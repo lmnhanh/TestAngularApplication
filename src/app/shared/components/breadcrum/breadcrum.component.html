@@ -1,0 +1,6 @@
+<div class="flex flex-row px-3 py-4">
+  <div class="flex items-center font-medium" *ngFor="let item of items; let idx = index">
+    <span class="text-textDarkest hover:text-blue-500 cursor-pointer" [routerLink]="[item.link]">{{ item.text }}</span>
+    <mat-icon *ngIf="idx < items.length - 1" [fontIcon]="seperator || defaultSeperator" />
+  </div>
+</div>

@@ -98,12 +98,12 @@
 </ng-template>
 
 <nz-table
-  [nzData]="listGroups.pageItemList"
+  [nzData]="listGroups.items"
   nzFrontPagination="false"
   nzShowPagination="true"
   nzShowSizeChanger="true"
   (nzPageIndexChange)="handlePageChange($event)"
-  [nzTotal]="listGroups.pageCount * searchParams.pageSize"
+  [nzTotal]="listGroups.totalItems"
   [nzPageIndex]="searchParams.page"
   (nzPageSizeChange)="handlePageSizeChange($event)"
   class="bg-white"
@@ -127,7 +127,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let group of listGroups.pageItemList" [ngClass]="setOfCheckedId.has(group.otapId) ? 'bg-slate-100' : ''">
+    <tr *ngFor="let group of listGroups.items" [ngClass]="setOfCheckedId.has(group.otapId) ? 'bg-slate-100' : ''">
       <td [nzChecked]="setOfCheckedId.has(group.otapId)" (nzCheckedChange)="onItemChecked(group.otapId, $event)"></td>
       <td>
         <ng-container *ngIf="group.devicesWithDuplicateValues != 0">

@@ -5,8 +5,8 @@ import { BaseApiRequest } from "./base.request";
 @Injectable({
     providedIn: "root",
 })
-export class AuthApiRequest extends BaseApiRequest{
+export class UserApiRequest extends BaseApiRequest{
     constructor(httpClient: HttpClient){
-        super(httpClient, 'https://localhost:7216/api/v1/auth');
+        super(httpClient, 'https://localhost:7216/api/v1/users');
     }
 }

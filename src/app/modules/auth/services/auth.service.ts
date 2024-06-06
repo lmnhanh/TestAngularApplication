@@ -4,7 +4,7 @@ import { DEFAULT_BASIC_TOKEN } from 'app/core/const/defaultBasicToken';
 import { AuthenticatedUser } from 'app/core/models/AuthenticatedUser';
 import { AuthApiRequest } from 'app/core/requests/auth.request';
 import { LocalStorageService } from 'app/core/storage/LocalStorageService';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 interface ILoginRequest {
   username: string;
@@ -12,17 +12,17 @@ interface ILoginRequest {
 }
 
 interface IAuthenticateResponse {
-  userName: string;
-  fullname: string;
-  roles: string[];
-  token: string;
+  name: string;
+  email: string;
+  isFirstLogin: boolean;
+  accessToken: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private _authUser = new AuthenticatedUser();
+  private _authUser = new AuthenticatedUser(null);
   private _userSubject = new BehaviorSubject<AuthenticatedUser>(this._authUser);
   private _user$ = this._userSubject.asObservable();
 
@@ -33,15 +33,24 @@ export class AuthService {
   }
 
   logIn(request: ILoginRequest, ifSuccess: () => void): void {
-    this.authRequest.post<ILoginRequest, IAuthenticateResponse>('login', request).subscribe({
-      next: (userInfo) => {
-        this.storeUserToken(userInfo.token);
-        this.saveToStorage('username', userInfo.userName);
-        this.saveToStorage('fullname', userInfo.fullname);
-        this.saveToStorage('roles', userInfo.roles.join(','));
-        ifSuccess();
-      },
-    });
+    //Uncomment to use your own auth API
+    // this.authRequest.post<ILoginRequest, IAuthenticateResponse>('login', request).subscribe({
+    //   next: (userInfo) => {
+    //     this.storeUserToken(userInfo.accessToken);
+    //     this.saveToStorage('name', userInfo.name);
+    //     this.saveToStorage('email', userInfo.email);
+    //     this.saveToStorage('isFirstLogin', `${userInfo.isFirstLogin}`);
+    //     this.setAuthenticatedUser(new AuthenticatedUser(this.storage));
+    //     ifSuccess();
+    //   },
+    // });
+
+    this.storeUserToken('Fake token');
+    this.saveToStorage('name', 'Fake');
+    this.saveToStorage('email', 'Fake@fake');
+    this.saveToStorage('isFirstLogin', `${false}`);
+    this.setAuthenticatedUser(new AuthenticatedUser(this.storage));
+    ifSuccess();
   }
 
   getAuthenticatedUserObservable(): Observable<AuthenticatedUser> {
@@ -66,7 +75,7 @@ export class AuthService {
 
   logOut(): void {
     this._authUser.clear();
-    this._userSubject.next(new AuthenticatedUser());
+    this._userSubject.next(new AuthenticatedUser(this.storage));
     this._authUser.storage?.clear();
     this._router.navigate(['auth', 'login'], { replaceUrl: true });
   }
