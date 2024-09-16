@@ -23,6 +23,7 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { EmptyCollectionComponent } from './components/empty-collection/empty-collection.component';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 @NgModule({
   imports: [NzEmptyModule],
@@ -53,6 +54,6 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
     NzCollapseModule,
     EmptyCollectionComponent,
   ],
-  declarations: [EmptyCollectionComponent],
+  declarations: [EmptyCollectionComponent, NotFoundComponent],
 })
 export class SharedModule {}

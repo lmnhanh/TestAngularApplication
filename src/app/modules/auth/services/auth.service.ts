@@ -4,7 +4,7 @@ import { DEFAULT_BASIC_TOKEN } from 'app/core/const/defaultBasicToken';
 import { AuthenticatedUser } from 'app/core/models/AuthenticatedUser';
 import { AuthApiRequest } from 'app/core/requests/auth.request';
 import { LocalStorageService } from 'app/core/storage/LocalStorageService';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
 
 interface ILoginRequest {
   username: string;
@@ -33,15 +33,21 @@ export class AuthService {
   }
 
   logIn(request: ILoginRequest, ifSuccess: () => void): void {
-    this.authRequest.post<ILoginRequest, IAuthenticateResponse>('login', request).subscribe({
-      next: (userInfo) => {
-        this.storeUserToken(userInfo.token);
-        this.saveToStorage('username', userInfo.userName);
-        this.saveToStorage('fullname', userInfo.fullname);
-        this.saveToStorage('roles', userInfo.roles.join(','));
-        ifSuccess();
-      },
-    });
+    // this.authRequest.post<ILoginRequest, IAuthenticateResponse>('login', request).subscribe({
+    //   next: (userInfo) => {
+    //     this.storeUserToken(userInfo.token);
+    //     this.saveToStorage('username', userInfo.userName);
+    //     this.saveToStorage('fullname', userInfo.fullname);
+    //     this.saveToStorage('roles', userInfo.roles.join(','));
+    //     ifSuccess();
+    //   },
+    // });
+
+    this.storeUserToken("Token");
+    this.saveToStorage('username', "LMA");
+    this.saveToStorage('fullname', "LMA");
+    this.saveToStorage('roles', "Maintainer");
+    ifSuccess();
   }
 
   getAuthenticatedUserObservable(): Observable<AuthenticatedUser> {
