@@ -1,13 +1,8 @@
 <div class="example-container">
   <h2>To do</h2>
 
-  <div
-    cdkDropList
-    #todoList="cdkDropList"
-    [cdkDropListData]="todo"
-    [cdkDropListConnectedTo]="[doneList]"
-    class="example-list"
-    (cdkDropListDropped)="drop($event)">
+  <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="todo" [cdkDropListConnectedTo]="[doneList]"
+    class="example-list" (cdkDropListDropped)="drop($event)">
     <div class="example-box" *ngFor="let item of todo" cdkDrag>
       <div class="dashed-placeholder" *cdkDragPlaceholder></div>
       {{ item }}
@@ -18,16 +13,28 @@
 <div class="example-container">
   <h2>Done</h2>
 
-  <div
-    cdkDropList
-    #doneList="cdkDropList"
-    [cdkDropListData]="done"
-    [cdkDropListConnectedTo]="[todoList]"
-    class="example-list"
-    (cdkDropListDropped)="drop($event)">
+  <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="done" [cdkDropListConnectedTo]="[todoList]"
+    class="example-list" (cdkDropListDropped)="drop($event)">
     <div class="example-box" *ngFor="let item of done" cdkDrag>
       <div class="dashed-placeholder" *cdkDragPlaceholder></div>
       {{ item }}
     </div>
   </div>
+</div>
+
+<app-custom-card title="My card">
+  <div ngProjectAs="footer">
+    Footer
+  </div>
+  <div appHightlightHover [active]="hoverClassName" *appTemplateHover="let item from todo">
+    {{item}}
+  </div>
+</app-custom-card>
+
+<div appHightlightHover [active]="hoverClassName">
+  Hello
+</div>
+
+<div appHightlightHover [active]="hoverClassName" con *appTemplateHover="let item from todo">
+  {{item}}
 </div>

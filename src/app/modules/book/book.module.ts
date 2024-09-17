@@ -7,6 +7,9 @@ import {
   CdkDropList,
   CdkDragPlaceholder
 } from '@angular/cdk/drag-drop';
+import { HightlightHoverDirective } from '../../shared/directives/hightlight-hover.directive';
+import { TemplateHoverDirective } from 'app/shared/directives/template-hover.directive';
+import { CustomCardComponent } from 'app/shared/components/custom-card/custom-card.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +20,10 @@ import {
     CdkDropList,
     CdkDrag,
     CdkDragPlaceholder,
-    BookRoutingModule
+    BookRoutingModule,
+    HightlightHoverDirective,
+    TemplateHoverDirective,
+    CustomCardComponent
   ]
 })
 export class BookModule { }
